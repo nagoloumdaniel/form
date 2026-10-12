@@ -1,6 +1,6 @@
 "use client";
 
-import { LogIn } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -15,7 +15,6 @@ import { postJson } from "@/lib/api/client";
 import { loginSchema } from "@/lib/validation/auth";
 
 import { AuthHeading } from "./auth-heading";
-import { Confirmation } from "./confirmation";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
@@ -33,7 +32,14 @@ export function LoginForm() {
 
   if (form.succeeded) {
     return (
-      <Confirmation icon={LogIn} title="Connexion réussie" description="Ouverture de votre tableau de bord…" />
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed inset-0 z-10 flex min-h-dvh w-full items-center justify-center gap-2.5 bg-paper text-[13px] text-muted"
+      >
+        <Loader2 aria-hidden className="size-4 animate-spin" />
+        Ouverture de votre tableau de bord…
+      </div>
     );
   }
 

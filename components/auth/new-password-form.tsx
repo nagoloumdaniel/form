@@ -4,7 +4,7 @@ import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
-import { Button, buttonClass } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -139,11 +139,14 @@ export function NewPasswordForm() {
         </Button>
       </form>
 
-      <div className="mt-8 space-y-3 border-t border-line pt-6">
-        <Link href="/login" className={buttonClass("quiet")}>
+      <div className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6">
+        <BackLink href="/verify-code">Revenir au code</BackLink>
+        <Link
+          href="/login"
+          className="rounded text-[13px] text-muted underline-offset-4 outline-none transition hover:text-ink hover:underline focus-visible:ring-[3px] focus-visible:ring-accent/30"
+        >
           Se connecter
         </Link>
-        <BackLink href="/verify-code">Revenir au code</BackLink>
       </div>
     </>
   );
