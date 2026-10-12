@@ -23,7 +23,12 @@ const newPassword = z
     message: `Au moins ${authConfig.minPasswordLength} caractères.`,
   })
   .max(200, { message: "Mot de passe trop long." })
-  .refine((value) => /\d/.test(value), { message: "Ajoutez au moins un chiffre." });
+  .refine((value) => /\d/.test(value), { message: "Ajoutez au moins un chiffre." })
+  .refine((value) => /\p{Lu}/u.test(value), { message: "Ajoutez au moins une majuscule." })
+  .refine((value) => /\p{Ll}/u.test(value), { message: "Ajoutez au moins une minuscule." })
+  .refine((value) => /[^\p{L}\p{N}\s]/u.test(value), {
+    message: "Ajoutez au moins un symbole ou une ponctuation.",
+  });
 
 export const loginSchema = z.object({
   email,

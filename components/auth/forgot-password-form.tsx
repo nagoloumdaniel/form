@@ -1,10 +1,10 @@
 "use client";
 
-import { Loader2, MailCheck } from "lucide-react";
-import Link from "next/link";
+import { MailCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { Button, buttonClass } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Honeypot } from "@/components/ui/honeypot";
 import { Notice } from "@/components/ui/notice";
@@ -20,6 +20,7 @@ import { BackLink } from "./back-link";
 import { Confirmation } from "./confirmation";
 
 export function ForgotPasswordForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
 
@@ -38,15 +39,9 @@ export function ForgotPasswordForm() {
         title="Code envoyé"
         description={form.message ?? "Consultez votre boîte de réception."}
       >
-        {auto ? (
-          <p aria-live="polite" className="flex items-center gap-2.5 text-[13px] text-muted">
-            <Loader2 aria-hidden className="size-4 animate-spin" />
-            Redirection dans {remaining} seconde{remaining > 1 ? "s" : ""}
-          </p>
-        ) : null}
-        <Link href={nextStep} className={buttonClass("primary")}>
-          Saisir le code
-        </Link>
+        <Button pending={auto} disabled={auto} onClick={() => router.push(nextStep)} aria-live="polite">
+          {auto ? `Redirection dans ${remaining} seconde${remaining > 1 ? "s" : ""}` : "Saisir le code"}
+        </Button>
         <Button variant="quiet" onClick={form.reset}>
           Changer d&apos;adresse
         </Button>

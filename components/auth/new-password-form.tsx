@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRound, Loader2 } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
@@ -38,7 +38,12 @@ export function NewPasswordForm() {
   });
 
   const expired = form.httpStatus === 401;
-  const { remaining, auto } = useCountdownRedirect("/forgot-password", 4, expired);
+  const { remaining: expiredRemaining, auto: expiredAuto } = useCountdownRedirect(
+    "/forgot-password",
+    4,
+    expired,
+  );
+  const { remaining, auto } = useCountdownRedirect("/login", 3, form.succeeded);
 
   if (form.succeeded) {
     return (
@@ -47,9 +52,9 @@ export function NewPasswordForm() {
         title="Mot de passe mis à jour"
         description="Votre nouveau mot de passe est actif. Le code reçu ne fonctionne plus."
       >
-        <Link href="/login" className={buttonClass("primary")}>
-          Aller à la connexion
-        </Link>
+        <Button pending={auto} disabled={auto} onClick={() => window.location.replace("/login")}>
+          {auto ? `Redirection dans ${remaining} seconde${remaining > 1 ? "s" : ""}` : "Aller à la connexion"}
+        </Button>
       </Confirmation>
     );
   }
@@ -81,6 +86,7 @@ export function NewPasswordForm() {
             autoComplete="new-password"
             maxLength={200}
             autoFocus
+            placeholder="Entrez votre nouveau mot de passe"
             value={password}
             invalid={Boolean(form.fieldErrors.password)}
             aria-describedby={form.fieldErrors.password ? "password-error" : "password-hint"}
@@ -111,10 +117,10 @@ export function NewPasswordForm() {
         {form.globalError ? (
           <Notice tone="error">
             {form.globalError}{" "}
-            {expired && auto ? (
-              <span className="inline-flex items-center gap-1.5">
-                <Loader2 aria-hidden className="size-3.5 animate-spin" />
-                Retour à la demande de code dans {remaining} seconde{remaining > 1 ? "s" : ""}
+            {expired && expiredAuto ? (
+              <span>
+                Retour à la demande de code dans {expiredRemaining} seconde
+                {expiredRemaining > 1 ? "s" : ""}
               </span>
             ) : (
               <Link href="/forgot-password" className="underline underline-offset-4">
@@ -124,12 +130,19 @@ export function NewPasswordForm() {
           </Notice>
         ) : null}
 
-        <Button type="submit" pending={form.pending} disabled={expired}>
-          {form.pending ? "Enregistrement" : "Enregistrer le mot de passe"}
+        <Button type="submit" pending={form.pending || (expired && expiredAuto)} disabled={expired}>
+          {form.pending
+            ? "Enregistrement"
+            : expired && expiredAuto
+              ? `Retour dans ${expiredRemaining} seconde${expiredRemaining > 1 ? "s" : ""}`
+              : "Enregistrer le mot de passe"}
         </Button>
       </form>
 
-      <div className="mt-8 border-t border-line pt-6">
+      <div className="mt-8 space-y-3 border-t border-line pt-6">
+        <Link href="/login" className={buttonClass("quiet")}>
+          Se connecter
+        </Link>
         <BackLink href="/verify-code">Revenir au code</BackLink>
       </div>
     </>

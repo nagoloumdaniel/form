@@ -9,13 +9,20 @@ const rules = [
     test: (value: string) => value.length >= authConfig.minPasswordLength,
   },
   { label: "un chiffre", test: (value: string) => /\d/.test(value) },
+  { label: "une majuscule", test: (value: string) => /\p{Lu}/u.test(value) },
+  { label: "une minuscule", test: (value: string) => /\p{Ll}/u.test(value) },
+  {
+    label: "un symbole ou une ponctuation",
+    test: (value: string) => /[^\p{L}\p{N}\s]/u.test(value),
+  },
 ];
 
 export function PasswordRules({ value }: { value: string }) {
   return (
     <>
       <span className="sr-only">
-        {authConfig.minPasswordLength} caractères minimum, dont un chiffre.
+        {authConfig.minPasswordLength} caractères minimum, avec un chiffre, une majuscule,
+        une minuscule et un symbole ou une ponctuation.
       </span>
       <ul aria-hidden className="flex flex-wrap gap-x-4 gap-y-1.5">
       {rules.map((rule) => {

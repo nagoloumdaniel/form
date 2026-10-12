@@ -19,7 +19,7 @@ export const authConfig = {
   },
   maxBodyBytes: 4096,
   bcryptCost: 12,
-  minPasswordLength: 10,
+  minPasswordLength: 8,
 } as const;
 
 export function appUrl() {

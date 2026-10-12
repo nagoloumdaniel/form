@@ -1,10 +1,10 @@
 "use client";
 
 import { Check, Loader2, Pencil, RotateCw } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { Button, buttonClass } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { CodeInput } from "@/components/ui/code-input";
 import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
@@ -23,6 +23,7 @@ import { BackLink } from "./back-link";
 const NEXT_STEP = "/new-password";
 
 export function VerifyCodeForm({ initialEmail = "" }: { initialEmail?: string }) {
+  const router = useRouter();
   const [email, setEmail] = useState(initialEmail);
   const [draft, setDraft] = useState(initialEmail);
   // Sans adresse connue, on démarre directement en saisie.
@@ -181,15 +182,11 @@ export function VerifyCodeForm({ initialEmail = "" }: { initialEmail?: string })
 
         {done ? (
           <div className="space-y-3">
-            {auto ? (
-              <p aria-live="polite" className="flex items-center gap-2.5 text-[13px] text-muted">
-                <Loader2 aria-hidden className="size-4 animate-spin" />
-                Redirection dans {remaining} seconde{remaining > 1 ? "s" : ""}
-              </p>
-            ) : null}
-            <Link href={NEXT_STEP} className={buttonClass("primary")}>
-              Continuer maintenant
-            </Link>
+            <Button pending={auto} disabled={auto} onClick={() => router.push(NEXT_STEP)} aria-live="polite">
+              {auto
+                ? `Redirection dans ${remaining} seconde${remaining > 1 ? "s" : ""}`
+                : "Continuer maintenant"}
+            </Button>
           </div>
         ) : (
           <Button type="submit" pending={form.pending} disabled={codeLocked}>
