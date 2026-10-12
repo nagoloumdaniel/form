@@ -2,7 +2,7 @@
 
 import { Check, Loader2, Pencil, RotateCw } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { Button, buttonClass } from "@/components/ui/button";
 import { CodeInput } from "@/components/ui/code-input";
@@ -29,6 +29,12 @@ export function VerifyCodeForm({ initialEmail = "" }: { initialEmail?: string })
   const [editing, setEditing] = useState(initialEmail === "");
   const [code, setCode] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!sentTo) return;
+    const timeout = window.setTimeout(() => setSentTo(null), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [sentTo]);
 
   const form = useFormRequest({
     schema: verifyCodeSchema,

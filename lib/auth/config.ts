@@ -7,6 +7,9 @@ export const authConfig = {
   ticketTtlMinutes: 10,
   ticketCookie: "__Host-reset_ticket",
   emailCookie: "__Host-reset_email",
+  sessionCookie: process.env.NODE_ENV === "production" ? "__Host-session" : "session",
+  sessionTtlSeconds: 60 * 60 * 8,
+  rememberedSessionTtlSeconds: 60 * 60 * 24 * 30,
   maxCodeAttempts: 5,
   limits: {
     forgotEmail: { max: 5, windowMinutes: 15 },

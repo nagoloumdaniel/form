@@ -1,8 +1,8 @@
 "use client";
 
-import { ShieldCheck } from "lucide-react";
+import { LogIn } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -22,28 +22,18 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
 
-  // Aucune session n'est créée, l'API valide la saisie et confirme la réception.
   const form = useFormRequest({
     schema: loginSchema,
     submit: (values) => postJson("/api/auth/login", values),
   });
 
+  useEffect(() => {
+    if (form.succeeded) window.location.replace("/dashboard");
+  }, [form.succeeded]);
+
   if (form.succeeded) {
     return (
-      <Confirmation
-        icon={ShieldCheck}
-        title="Identifiants reçus"
-        description={
-          <>
-            Le formulaire fonctionne de bout en bout. L&apos;ouverture de session sera branchée
-            quand vous aurez choisi le mécanisme d&apos;authentification.
-          </>
-        }
-      >
-        <Button variant="quiet" onClick={form.reset}>
-          Revenir au formulaire
-        </Button>
-      </Confirmation>
+      <Confirmation icon={LogIn} title="Connexion réussie" description="Ouverture de votre tableau de bord…" />
     );
   }
 

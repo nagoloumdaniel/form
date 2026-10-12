@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { authConfig } from "@/lib/auth/config";
+import { verifySession } from "@/lib/auth/session";
 
 /** Pages qui marquent un retour au point de départ : on y repart sans aucun reste. */
 const RESET_ENTRY_POINTS = new Set(["/login", "/forgot-password"]);
@@ -32,9 +33,13 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/verify-code", request.url));
   }
 
+  if (pathname === "/dashboard" && !verifySession(request.cookies.get(authConfig.sessionCookie)?.value)) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/login", "/forgot-password", "/new-password"],
+  matcher: ["/login", "/forgot-password", "/new-password", "/dashboard"],
 };
