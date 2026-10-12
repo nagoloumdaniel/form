@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #fbfbfa;
+  --surface: #ffffff;
+  --ink: #16181c;
+  --muted: #646a73;
+  --line: #d8d8d3;
+  --field: #ffffff;
+  --accent: #243b6b;
+  --accent-hover: #1b2d53;
+  --accent-ink: #ffffff;
+  --danger: #9a2b21;
+  --success: #1f6b4f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e0f12;
+    --surface: #15171b;
+    --ink: #e9e9e7;
+    --muted: #979ca4;
+    --line: #32363e;
+    --field: #111316;
+    --accent: #4663b4;
+    --accent-hover: #3b549b;
+    --accent-ink: #ffffff;
+    --danger: #e0867a;
+    --success: #6cc79f;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-field: var(--field);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+/* Trame de hairlines du panneau droit */
+.panel-grid {
+  background-image:
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+  background-size: 7.5rem 7.5rem;
+  background-position: center;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 20%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
