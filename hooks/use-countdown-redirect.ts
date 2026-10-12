@@ -1,29 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-
-function subscribe(onChange: () => void) {
-  const query = window.matchMedia(REDUCED_MOTION);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
+import { useEffect, useRef, useState } from "react";
 
 /** Décompte puis redirection. Désactivé si la personne limite les animations. */
 export function useCountdownRedirect(href: string, seconds: number, active: boolean) {
   const router = useRouter();
   const [remaining, setRemaining] = useState(seconds);
   const pushed = useRef(false);
-  const reduced = useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    () => false,
-  );
 
   useEffect(() => {
-    if (!active || reduced) return;
+    if (!active) return;
     router.prefetch(href);
     const deadline = Date.now() + seconds * 1000;
 
@@ -40,7 +27,7 @@ export function useCountdownRedirect(href: string, seconds: number, active: bool
     }, 250);
 
     return () => clearInterval(tick);
-  }, [active, reduced, href, seconds, router]);
+  }, [active, href, seconds, router]);
 
-  return { remaining: Math.max(remaining, 1), auto: !reduced };
+  return { remaining: Math.max(remaining, 1), auto: true };
 }
