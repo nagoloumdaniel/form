@@ -7,8 +7,14 @@ import { authConfig } from "./config";
 const VERSION = "v1";
 const secureCookie = authConfig.sessionCookie.startsWith("__Host-");
 
+function secret() {
+  const value = process.env.RESET_CODE_SECRET;
+  if (!value) throw new Error("RESET_CODE_SECRET est absent de l'environnement.");
+  return value;
+}
+
 function sign(value: string) {
-  return createHmac("sha256", process.env.RESET_CODE_SECRET ?? "")
+  return createHmac("sha256", secret())
     .update(value)
     .digest("base64url");
 }
@@ -23,7 +29,7 @@ export function attachSession(response: NextResponse, userId: string, remember: 
     value: `${payload}.${sign(payload)}`,
     httpOnly: true,
     secure: secureCookie,
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     maxAge: expiresAt - Math.floor(Date.now() / 1000),
   });
@@ -36,7 +42,7 @@ export function clearSession(response: NextResponse) {
     value: "",
     httpOnly: true,
     secure: secureCookie,
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     maxAge: 0,
   });

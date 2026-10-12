@@ -1,5 +1,4 @@
 export const authConfig = {
-  /** Caractères sans ambiguïté visuelle (ni O/0, ni I/1). */
   codeAlphabet: "ABCDEFGHJKLMNPQRSTUVWXYZ23456789",
   codeLength: 6,
   codeGroupSize: 3,

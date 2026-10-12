@@ -5,12 +5,12 @@ import { authConfig } from "@/lib/auth/config";
  * falsifiable par le client, contrairement à `x-forwarded-for`.
  */
 export function clientIp(request: Request) {
-  const trusted = request.headers.get("x-vercel-forwarded-for");
+  const trusted = process.env.VERCEL === "1"
+    ? request.headers.get("x-vercel-forwarded-for")
+    : null;
   if (trusted) return trusted.split(",")[0].trim();
 
-  const forwarded = request.headers.get("x-forwarded-for");
-  const first = forwarded?.split(",")[0]?.trim();
-  return first || request.headers.get("x-real-ip") || "ip-absente";
+  return "ip-absente";
 }
 
 /** Corps JSON borné en taille et en type, null si l'appel n'est pas conforme. */
