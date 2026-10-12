@@ -1,7 +1,7 @@
 import { and, eq, isNull } from "drizzle-orm";
 import { after } from "next/server";
 
-import { badRequest, invalid, ok, tooMany, unexpected } from "@/lib/api/errors";
+import { badRequest, fail, invalid, ok, tooMany, unexpected } from "@/lib/api/errors";
 import { clientIp, readJsonBody } from "@/lib/api/request";
 import { generateResetCode, hashResetCode } from "@/lib/auth/code";
 import { authConfig } from "@/lib/auth/config";
@@ -11,33 +11,25 @@ import { getDb, schema } from "@/lib/db";
 import { sendResetCode } from "@/lib/mail/send";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
-const NEUTRAL = "Si un compte existe pour cette adresse, le code arrive dans quelques instants.";
+const UNKNOWN_ACCOUNT = "Cet utilisateur n'est pas inscrit sur la plateforme.";
+const HONEYPOT_RESPONSE = "Si un compte existe pour cette adresse, le code arrive dans quelques instants.";
 
-/** Tout ce qui dépend du compte se fait après la réponse, la latence ne révèle rien. */
-async function issueCode(email: string) {
+async function issueCode(email: string, userId: string) {
   const db = getDb();
-  const [user] = await db
-    .select({ id: schema.users.id })
-    .from(schema.users)
-    .where(eq(schema.users.email, email))
-    .limit(1);
-
-  if (!user) return;
-
   await db
     .update(schema.passwordResetCodes)
     .set({ usedAt: new Date() })
     .where(
       and(
-        eq(schema.passwordResetCodes.userId, user.id),
+        eq(schema.passwordResetCodes.userId, userId),
         isNull(schema.passwordResetCodes.usedAt),
       ),
     );
 
   const code = generateResetCode();
   await db.insert(schema.passwordResetCodes).values({
-    userId: user.id,
-    codeHash: hashResetCode(code, user.id),
+    userId,
+    codeHash: hashResetCode(code, userId),
     expiresAt: new Date(Date.now() + authConfig.codeTtlMinutes * 60_000),
   });
 
@@ -50,7 +42,7 @@ export async function POST(request: Request) {
     if (body === null) return badRequest();
 
     // Champ piège, invisible pour une personne, rempli par les robots.
-    if (typeof body === "object" && (body as { company?: unknown }).company) return ok(NEUTRAL);
+    if (typeof body === "object" && (body as { company?: unknown }).company) return ok(HONEYPOT_RESPONSE);
 
     const parsed = forgotPasswordSchema.safeParse(body);
     if (!parsed.success) return invalid(parsed.error);
@@ -66,11 +58,19 @@ export async function POST(request: Request) {
     const byEmail = await consumeRateLimit(`forgot:email:${email}`, authConfig.limits.forgotEmail);
     if (!byEmail.allowed) return tooMany(byEmail.retryAfter);
 
-    after(() => issueCode(email));
+    const db = getDb();
+    const [user] = await db
+      .select({ id: schema.users.id })
+      .from(schema.users)
+      .where(eq(schema.users.email, email))
+      .limit(1);
+    if (!user) return fail(404, UNKNOWN_ACCOUNT);
+
+    after(() => issueCode(email, user.id));
     after(maybePurge);
 
     // Un ticket déjà en circulation ne survit pas à une nouvelle demande.
-    return attachEmail(clearTicket(ok(NEUTRAL)), email);
+    return attachEmail(clearTicket(ok("Un nouveau code arrive dans quelques instants.")), email);
   } catch (error) {
     return unexpected(error);
   }

@@ -53,7 +53,7 @@ npm audit --omit=dev
 - Les codes et tickets sont hachés avec HMAC-SHA256 et expirent.
 - Les sessions sont signées côté serveur et stockées dans un cookie HTTP-only.
 - Les réponses API sont privées et désactivent la mise en cache.
-- Les demandes de réinitialisation ne révèlent pas si un compte existe.
+- Les demandes de réinitialisation refusent les adresses qui ne correspondent à aucun compte.
 - Les limites de débit sont stockées en base et les corps JSON sont limités.
 - Les fichiers d'environnement locaux et les fichiers Claude sont ignorés par Git.
 
