@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LogOut } from "lucide-react";
 
 import { postJson } from "@/lib/api/client";
 
@@ -21,6 +22,7 @@ export function LogoutButton() {
         ]).then(() => window.location.replace("/login"));
       }}
     >
+      {!pending ? <LogOut aria-hidden className="size-4" /> : null}
       {pending ? "Déconnexion" : "Se déconnecter"}
     </Button>
   );
