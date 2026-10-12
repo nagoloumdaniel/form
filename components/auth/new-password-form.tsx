@@ -87,6 +87,7 @@ export function NewPasswordForm() {
             maxLength={200}
             autoFocus
             placeholder="Entrez votre nouveau mot de passe"
+            disabled={expired}
             value={password}
             invalid={Boolean(form.fieldErrors.password)}
             aria-describedby={form.fieldErrors.password ? "password-error" : "password-hint"}
@@ -104,6 +105,7 @@ export function NewPasswordForm() {
             autoComplete="new-password"
             maxLength={200}
             placeholder="Retapez le mot de passe"
+            disabled={expired}
             value={confirmPassword}
             invalid={Boolean(form.fieldErrors.confirmPassword)}
             aria-describedby={form.fieldErrors.confirmPassword ? "confirmPassword-error" : undefined}
@@ -117,16 +119,11 @@ export function NewPasswordForm() {
         {form.globalError ? (
           <Notice tone="error">
             {form.globalError}{" "}
-            {expired && expiredAuto ? (
-              <span>
-                Retour à la demande de code dans {expiredRemaining} seconde
-                {expiredRemaining > 1 ? "s" : ""}
-              </span>
-            ) : (
+            {!expired ? (
               <Link href="/forgot-password" className="underline underline-offset-4">
                 Demander un code
               </Link>
-            )}
+            ) : null}
           </Notice>
         ) : null}
 

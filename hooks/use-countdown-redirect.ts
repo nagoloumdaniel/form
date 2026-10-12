@@ -36,7 +36,7 @@ export function useCountdownRedirect(href: string, seconds: number, active: bool
       clearInterval(tick);
       if (pushed.current) return;
       pushed.current = true;
-      router.push(href);
+      window.location.replace(href);
     }, 250);
 
     return () => clearInterval(tick);
